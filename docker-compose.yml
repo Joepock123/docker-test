@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8000
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: yourpassword
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    ports:
+      - "9092:9092"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+networks:
+  default:
+    name: backend-network
